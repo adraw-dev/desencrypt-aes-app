@@ -8,6 +8,7 @@ function App() {
   const [iv, setIv] = useState("");
   const [ciphertext, setCiphertext] = useState("");
   const [result, setResult] = useState({});
+  const [errors, setError] = useState("");
 
   useEffect(() => {
     // Recuperar valores del localStorage al cargar la página
@@ -38,13 +39,14 @@ function App() {
       });
 
       const plainText = JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
-
-      setResult(
-        plainText || "⚠️ No se pudo desencriptar (clave/iv incorrectos)"
-      );
+      if (plainText) {
+        setResult(plainText);
+      } else {
+        setError("⚠️ No se pudo desencriptar (clave/iv incorrectos)");
+      }
     } catch (error) {
       console.error(error);
-      setResult("❌ Error al desencriptar");
+      setError("❌ Error al desencriptar");
     }
   };
 
@@ -73,7 +75,7 @@ function App() {
               </Button>
             )}
           </div>
-      
+
           <input
             type="text"
             placeholder="Encryption Key (hex)"
@@ -104,8 +106,14 @@ function App() {
 
         <div className="mt-6">
           <h2 className="font-semibold">Resultado:</h2>
-          <div className="mt-2 p-3 bg-gray-100 rounded ">
-            <JsonView value={result} />
+          <div className="mt-2 px-3 py-10 bg-gray-100 rounded ">
+            {errors ? (
+              <p className="">{errors}</p>
+            ) : (
+              Object.keys(result).length > 0 && (
+              <JsonView displayDataTypes={false} value={result} />
+              )
+            )}
           </div>
         </div>
       </div>
